@@ -1,0 +1,53 @@
+# Multi-SIP Automation Command Reference Cheat Sheet
+# ===================================================
+
+# 1. Setup & Installation
+# -----------------------
+python -m venv venv
+# Windows PowerShell:
+.\venv\Scripts\Activate.ps1
+# Windows CMD:
+.\venv\Scripts\activate.bat
+# Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+playwright install chromium
+
+# 2. Run Live Headed Pytest Flow with Visual Slow-Mo (Multi-SIP DIY Journey):
+# ----------------------------------------------------------------------------
+# From Project Root:
+python -m pytest multisip_test/tests/test_multisip_flow.py --headed --slowmo 500
+
+# Or from inside multisip_test/:
+cd multisip_test
+python -m pytest tests/test_multisip_flow.py --headed --slowmo 500
+
+# 3. Run Headless Execution (for CI/CD or Background Runner):
+# -----------------------------------------------------------
+# Windows PowerShell:
+$env:HEADLESS="true"; python -m pytest multisip_test/tests/test_multisip_flow.py
+# Windows CMD:
+set HEADLESS=true && python -m pytest multisip_test/tests/test_multisip_flow.py
+# Linux/macOS:
+HEADLESS=true python -m pytest multisip_test/tests/test_multisip_flow.py
+
+# 4. Target Specific Environment (LOCAL, QA, UAT, PROD):
+# -------------------------------------------------------
+# Windows PowerShell:
+$env:TEST_ENV="QA"; python -m pytest multisip_test/tests/test_multisip_flow.py --headed
+# Via Pytest CLI Option:
+python -m pytest multisip_test/tests/test_multisip_flow.py --headed --env=QA
+
+# 5. Generate Excel Test Cases Matrix:
+# ------------------------------------
+python multisip_test/utils/generate_test_cases.py
+
+# 6. Run Data-Driven Test Cases via Excel Engine:
+# -----------------------------------------------
+python multisip_test/tests/run_excel_tests.py
+
+# 7. Generate Master Implementation Plan PDF:
+# -------------------------------------------
+python generate_pdf.py
+

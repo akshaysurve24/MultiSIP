@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Enterprise Automation Framework — Master Implementation Plan</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 9pt;
+      color: #666;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #24292e;
+    line-height: 1.6;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Cover Page */
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .cover-badge {
+    background: #C7222A;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11pt;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    display: inline-block;
+  }
+
+  .cover h1 {
+    font-size: 28pt;
+    color: #1a1a1a;
+    margin: 0 0 15px 0;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .cover h2 {
+    font-size: 15pt;
+    color: #555;
+    font-weight: 400;
+    margin: 0 0 40px 0;
+  }
+
+  .cover-meta {
+    border-top: 2px solid #e1e4e8;
+    padding-top: 25px;
+    width: 80%;
+    margin: 40px auto 0 auto;
+    font-size: 10pt;
+    color: #586069;
+    line-height: 1.8;
+  }
+
+  /* Headings & Structure */
+  h1, h2, h3, h4 {
+    color: #1a202c;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  h1 {
+    font-size: 18pt;
+    border-bottom: 2px solid #C7222A;
+    padding-bottom: 6px;
+    margin-top: 30px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 13pt;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    color: #2d3748;
+  }
+
+  h3 {
+    font-size: 11.5pt;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+  }
+
+  ul, ol {
+    margin-top: 4px;
+    margin-bottom: 12px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+
+  /* Code blocks */
+  pre {
+    background-color: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    overflow-x: auto;
+    margin: 10px 0 16px 0;
+    page-break-inside: avoid;
+  }
+
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    background-color: rgba(27,31,35,0.05);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 9pt;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px 0;
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: #f3f4f6;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #fafafa;
+  }
+
+  /* Callout boxes */
+  .callout {
+    border-left: 4px solid #C7222A;
+    background-color: #fff5f5;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 14px 0;
+    page-break-inside: avoid;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #C7222A;
+    margin-bottom: 4px;
+    font-size: 10pt;
+  }
+
+  .callout-blue {
+    border-left-color: #1f4e79;
+    background-color: #f0f7ff;
+  }
+  .callout-blue .callout-title {
+    color: #1f4e79;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+
+  @media print {
+    body {
+      font-size: 9.5pt;
+    }
+    h1 {
+      font-size: 16pt;
+    }
+    h2 {
+      font-size: 12pt;
+    }
+    pre {
+      font-size: 8pt;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-badge">Enterprise QA Blueprint</div>
+  <h1>Multi-Project End-to-End Automation Framework</h1>
+  <h2>Standard Operating Procedure & Architectural Master Plan for Mutual Fund Journeys (Multi-SIP, Lumpsum, Redemption, STP, SWP)</h2>
+  
+  <div class="cover-meta">
+    <p><strong>Framework Core:</strong> Python 3.10+ • Playwright • Pytest • OpenPyXL • POM Architecture</p>
+    <p><strong>Target Architecture:</strong> Centralized URL Routing • Desktop Viewport Maximization • Page-Wise Unblurred Screenshots • Excel Data-Driven Execution</p>
+    <p><strong>Applicability:</strong> Aditya Birla Sun Life Mutual Fund (ABSLMF) & Enterprise Modern SPAs (Angular, React, Radix UI)</p>
+    <p><strong>Document Version:</strong> 2.0 (Consolidated Enterprise Release)</p>
+  </div>
+</div>
+
+<!-- CHAPTER 1 -->
+<h1>1. Executive Summary & Core Pillars</h1>
+<p>
+This master implementation plan establishes an enterprise-grade, highly repeatable web test automation framework. It eliminates common bottlenecks in modern Single Page Application (SPA) testing—such as viewport clipping, responsive layout collapse, dynamic timing anomalies, overlay click interception, and test data collision.
+</p>
+<p>
+Any developer or QA engineer can use this exact blueprint to automate new modules (e.g., <strong>Lumpsum</strong>, <strong>SIP</strong>, <strong>STP</strong>, <strong>SWP</strong>, <strong>Switch</strong>, or <strong>Mandates</strong>) in under 15 minutes by adhering to the following five golden pillars:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">Pillar</th>
+      <th style="width: 35%;">Implementation Rule</th>
+      <th style="width: 40%;">Benefit & Protection</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Centralized Routing</strong></td>
+      <td>All base domains, portal prefixes, and route endpoints reside exclusively inside <code>data/urls.py</code> (<code>AppURLs</code>).</td>
+      <td>Switch test environments across entire test suites instantly via <code>TEST_ENV=QA</code> or <code>UAT</code> without modifying page objects or tests.</td>
+    </tr>
+    <tr>
+      <td><strong>2. True Desktop Maximization</strong></td>
+      <td>Configure both <code>no_viewport=True</code> in <code>browser_context_args</code> and <code>--start-maximized</code> in <code>browser_type_launch_args</code>.</td>
+      <td>Prevents responsive frameworks (Tailwind, Radix UI) from collapsing desktop tables, forms, and buttons into mobile hamburger drawers.</td>
+    </tr>
+    <tr>
+      <td><strong>3. Traceable Screenshots</strong></td>
+      <td>Every capture call inside <code>BasePage</code> uses <code>full_page=True, animations="disabled"</code> saved into <code>screenshots/&lt;PageObjectClassName&gt;/</code>.</td>
+      <td>Captures entire scrollable forms without anti-aliasing artifacts or visual blurring; organized dynamically per screen.</td>
+    </tr>
+    <tr>
+      <td><strong>4. Page Object Model (POM)</strong></td>
+      <td>Strict separation of locators and UI actions inside <code>pages/</code>. Tests contain only linear business logic and assertions.</td>
+      <td>Zero raw selectors in test files. Changes in UI locators require updates in only a single page class.</td>
+    </tr>
+    <tr>
+      <td><strong>5. Dual-Engine Execution</strong></td>
+      <td>Pytest runner for visual E2E verification (<code>--headed --slowmo 500</code>) and Excel Data-Driven runner for automated regression & audit reporting.</td>
+      <td>Supports both interactive debugging and spreadsheet-driven compliance audits with automatic PASS/FAIL results recording.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- CHAPTER 2 -->
+<h1>2. Normalized Project Structure & File Taxonomy</h1>
+<p>
+When scaffolding a new repository or module, replicate this exact normalized layout:
+</p>
+
+<pre>
+&lt;Project_Root&gt;/                           # e.g., MultiSIP/ or Lumpsum/
+├── .agents/
+│   └── AGENTS.md                         # Persistent AI & developer rules and SPA locator tips
+├── .env.example                          # Secret keys & test credentials template
+├── requirements.txt                      # Single project dependencies file
+├── conftest.py                           # Consolidated Pytest fixtures & viewport config
+├── command.txt                           # Quick CLI copy-paste cheat sheet
+├── uat script.txt                        # Verbatim manual test specifications / BRD notes
+├── README.md                             # Framework documentation
+├── implementation_plans/                 # Architectural blueprints & PDF export utilities
+│   ├── Multi_Project_Automation_Framework_Master_Plan.html
+│   └── ...
+└── &lt;module_name&gt;_test/                   # Primary test package (e.g., multisip_test/ or lumpsum_test/)
+    ├── data/
+    │   ├── __init__.py
+    │   ├── urls.py                       # AppURLs: Domains, relative routes & parameterized builders
+    │   └── test_data.py                  # TestData constants, safe defaults & .env loader
+    ├── pages/                            # Page Object Model Layer
+    │   ├── __init__.py                   # Central export for all Page Objects
+    │   ├── base_page.py                  # Playwright interaction wrapper & auto-screenshots
+    │   ├── login_page.py                 # Reusable login (PAN, Terms, Continue, 4-digit OTP)
+    │   ├── dashboard_page.py             # Nominee popup dismissal, Transact menu
+    │   ├── &lt;feature&gt;_landing_page.py     # Feature landing (Invest Now / DIY / Scheme selector)
+    │   ├── &lt;feature&gt;_config_page.py      # Core configuration (Date, Amount, Units, Folio)
+    │   ├── payment_page.py               # Mandate selection (ROTM/Netbanking/UPI), Bank, Proceed
+    │   ├── gateway_simulation_page.py    # BillDesk simulator (Success/Failure status)
+    │   └── success_page.py               # Order verification, Track Status, Back to Home
+    ├── utils/                            # Shared Utilities Layer
+    │   ├── __init__.py
+    │   ├── data_generator.py             # Dynamic data (T+2 dates, non-colliding mobile/email/PAN)
+    │   ├── excel_manager.py              # OpenPyXL execution audit logger & result updater
+    │   ├── excel_utils.py                # Excel cell formatting, colors, and auto-fit columns
+    │   └── generate_test_cases.py        # Automated test matrix generation engine
+    ├── screenshots/                      # Auto-generated runtime screenshots organized by Page Object
+    └── tests/                            # Test Execution Layer
+        ├── __init__.py
+        ├── test_&lt;feature&gt;_flow.py        # Master Pytest linear E2E user journey
+        └── run_excel_tests.py            # Data-driven background Excel execution runner
+</pre>
+
+<div class="callout callout-blue">
+  <div class="callout-title">Architectural Consolidation Rule</div>
+  Maintain <strong>one single root <code>conftest.py</code></strong> and <strong>one root <code>requirements.txt</code></strong>. Do not create nested duplicate configuration files inside package folders, as this causes duplicate fixture registration in Pytest.
+</div>
+
+<div class="page-break"></div>
+
+<!-- CHAPTER 3 -->
+<h1>3. Centralized URL Management (`data/urls.py`)</h1>
+<p>
+Hardcoding URLs across page objects or tests causes catastrophic maintenance failures when switching environments. All environments (LOCAL, QA, UAT, PROD) and route structures are maintained inside <code>data/urls.py</code>:
+</p>
+
+<pre><code>import os
+
+class AppURLs:
+    """
+    Single Source of Truth for base domains and route paths.
+    Switch environments via TEST_ENV=QA or TEST_ENV=UAT (defaults to UAT).
+    """
+    ENV_DOMAINS = {
+        "LOCAL": "http://localhost:3000",
+        "QA": "https://investorqa.abslmfbeta.com",
+        "UAT": "https://investoruat.abslmfbeta.com",
+        "PROD": "https://mutualfund.adityabirlacapital.com",
+    }
+
+    ACTIVE_ENV = os.getenv("TEST_ENV", "UAT").upper()
+    BASE_DOMAIN = ENV_DOMAINS.get(ACTIVE_ENV, ENV_DOMAINS["UAT"])
+    PORTAL_PREFIX = "/mf-investor"
+    BASE_URL = f"{BASE_DOMAIN}{PORTAL_PREFIX}"
+
+    # Route Paths (Relative)
+    LOGIN_PATH = f"{PORTAL_PREFIX}/login"
+    DASHBOARD_PATH = f"{PORTAL_PREFIX}/dashboard"
+    MULTISIP_PATH = f"{PORTAL_PREFIX}/multi-sip"
+    MULTISIP_DIY_PATH = f"{PORTAL_PREFIX}/multi-sip/diy"
+    PAYMENT_PATH = f"{PORTAL_PREFIX}/multi-sip/payment?type=diy"
+    SUCCESS_PATH = f"{PORTAL_PREFIX}/multi-sip/success"
+
+    # Absolute URLs
+    LOGIN_URL = f"{BASE_DOMAIN}{LOGIN_PATH}"
+    DASHBOARD_URL = f"{BASE_DOMAIN}{DASHBOARD_PATH}"
+    MULTISIP_URL = f"{BASE_DOMAIN}{MULTISIP_PATH}"
+    MULTISIP_DIY_URL = f"{BASE_DOMAIN}{MULTISIP_DIY_PATH}"
+    PAYMENT_URL = f"{BASE_DOMAIN}{PAYMENT_PATH}"
+    SUCCESS_URL = f"{BASE_DOMAIN}{SUCCESS_PATH}"
+
+    # Dynamic Route Builders for Custom Modules (e.g. Lumpsum or Specific Schemes)
+    @classmethod
+    def get_lumpsum_config_url(cls, scheme_code: str = "251GZ") -> str:
+        return f"{cls.BASE_URL}/invest/lumpsum?schemeCode={scheme_code}"
+
+    @classmethod
+    def get_payment_url(cls, journey_type: str = "lumpsum") -> str:
+        return f"{cls.BASE_URL}/payment?type={journey_type}"
+</code></pre>
+
+<!-- CHAPTER 4 -->
+<h1>4. Desktop Window Maximization Fix (`conftest.py`)</h1>
+<p>
+Playwright's default emulated 1280x720 viewport breaks modern desktop layouts. In responsive frameworks (Tailwind, Bootstrap, Radix UI), wide multi-fund tables collapse and sticky action bars hide behind off-screen drawers.
+</p>
+<p>
+To resolve this permanently, configure both <code>no_viewport=True</code> on the browser context and <code>--start-maximized</code> on browser launch:
+</p>
+
+<pre><code>import os
+import sys
+from pathlib import Path
+import pytest
+from dotenv import load_dotenv
+
+# Ensure all sub-packages resolve in sys.path
+PROJECT_ROOT = Path(__file__).resolve().parent
+for directory in (PROJECT_ROOT / "multisip_test", PROJECT_ROOT):
+    dir_str = str(directory)
+    if dir_str not in sys.path:
+        sys.path.insert(0, dir_str)
+
+load_dotenv()
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--env",
+        action="store",
+        default=os.getenv("TEST_ENV", "UAT"),
+        help="Target test environment: LOCAL, QA, UAT, PROD",
+    )
+
+@pytest.fixture(scope="session", autouse=True)
+def set_test_env(pytestconfig):
+    env = pytestconfig.getoption("env").upper()
+    os.environ["TEST_ENV"] = env
+    return env
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    """Disable emulated fixed viewport so window dictates true dimensions."""
+    return {
+        **browser_context_args,
+        "no_viewport": True,
+    }
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    """Launch maximized desktop browser; headed by default, configurable for CI."""
+    is_headless = os.getenv("HEADLESS", "false").lower() in ("true", "1", "yes")
+    return {
+        **browser_type_launch_args,
+        "headless": is_headless,
+        "args": ["--start-maximized"],
+    }
+</code></pre>
+
+<div class="page-break"></div>
+
+<!-- CHAPTER 5 -->
+<h1>5. Core Interaction Wrapper (`pages/base_page.py`)</h1>
+<p>
+The <code>BasePage</code> class provides standardized browser primitives, handles slow character typing, bypasses transparent backdrop overlays using JavaScript evaluation, and enforces full-page screenshot capturing into class-segregated directories:
+</p>
+
+<pre><code>import os
+import time
+from playwright.sync_api import Page, Locator, TimeoutError as PlaywrightTimeoutError
+
+class BasePage:
+    def __init__(self, page: Page):
+        self.page = page
+
+    def go_to(self, url: str):
+        self.page.goto(url)
+        self.page.wait_for_load_state("domcontentloaded")
+        self.take_screenshot("navigation")
+
+    def click(self, locator: str, name_for_screenshot: str = "click", force: bool = False):
+        self.page.locator(locator).click(force=force)
+        self.take_screenshot(name_for_screenshot)
+
+    def js_click(self, locator: str, name_for_screenshot: str = "js_click"):
+        """Bypasses transparent modals, loaders, or sticky headers via native DOM click."""
+        self.page.locator(locator).evaluate("node => node.click()")
+        self.take_screenshot(name_for_screenshot)
+
+    def slow_fill(self, locator: str, text: str, delay_ms: float = 80, name_for_screenshot: str = "fill"):
+        loc: Locator = self.page.locator(locator)
+        loc.clear()
+        for char in str(text):
+            loc.type(char, delay=delay_ms)
+        self.take_screenshot(name_for_screenshot)
+
+    def select_option_by_value(self, locator: str, value: str, name_for_screenshot: str = "select"):
+        self.page.locator(locator).select_option(value=value)
+        self.take_screenshot(name_for_screenshot)
+
+    def select_option_by_label(self, locator: str, label: str, name_for_screenshot: str = "select"):
+        self.page.locator(locator).select_option(label=label)
+        self.take_screenshot(name_for_screenshot)
+
+    def wait_for_selector(self, locator: str, state: str = "visible", timeout: float = 30000):
+        self.page.wait_for_selector(locator, state=state, timeout=timeout)
+
+    def is_visible(self, locator: str, timeout: float = 5000) -> bool:
+        try:
+            self.page.wait_for_selector(locator, state="visible", timeout=timeout)
+            return True
+        except PlaywrightTimeoutError:
+            return False
+
+    def wait_for_url_contains(self, text: str, timeout: float = 30000):
+        self.page.wait_for_url(lambda url: text in url, timeout=timeout)
+
+    def wait(self, ms: int):
+        self.page.wait_for_timeout(ms)
+
+    def take_screenshot(self, name: str) -> str:
+        """Captures unblurred full-page screenshots in class-named folders."""
+        page_name = self.__class__.__name__
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        screenshot_dir = os.path.join(base_dir, "screenshots", page_name)
+        os.makedirs(screenshot_dir, exist_ok=True)
+
+        timestamp = int(time.time() * 1000)
+        screenshot_path = os.path.join(screenshot_dir, f"{name}_{timestamp}.png")
+        self.page.screenshot(path=screenshot_path, full_page=True, animations="disabled")
+        return screenshot_path
+</code></pre>
+
+<div class="page-break"></div>
+
+<!-- CHAPTER 6 -->
+<h1>6. Modern SPA Locator Guidelines & Radix UI Patterns</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">UI Component</th>
+      <th style="width: 35%;">HTML / Radix Characteristic</th>
+      <th style="width: 40%;">Recommended Locator Pattern</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Custom Checkbox</strong></td>
+      <td><code>&lt;button role="checkbox" data-state="unchecked"&gt;</code></td>
+      <td>Check <code>get_attribute("data-state") != "checked"</code> before clicking to prevent accidental unchecking.</td>
+    </tr>
+    <tr>
+      <td><strong>Accordions / Drawers</strong></td>
+      <td><code>&lt;button aria-expanded="false" data-state="closed"&gt;</code></td>
+      <td>Click accordion header, wait for <code>data-state="open"</code>, then click the child option inside.</td>
+    </tr>
+    <tr>
+      <td><strong>Split OTP Inputs</strong></td>
+      <td>4 separate inputs with <code>aria-label="OTP digit 1..4"</code></td>
+      <td>Iterate through digit inputs sequentially with 150ms delay between keypresses to trigger JavaScript event listeners.</td>
+    </tr>
+    <tr>
+      <td><strong>Multi-Card Selection</strong></td>
+      <td>Multiple cards with identical <code>aria-label="Add to selection"</code></td>
+      <td>Scope button relative to the title: <code>//h2[contains(text(), 'Fund Name')]/ancestor::*...//button</code></td>
+    </tr>
+    <tr>
+      <td><strong>Angular Dynamic Inputs</strong></td>
+      <td><code>formcontrolname="TaxStatus"</code> with case sensitivity</td>
+      <td>Use case-insensitive selector modifier: <code>select[formcontrolname='taxStatus' i]</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- CHAPTER 7 -->
+<h1>7. Dynamic Test Data Engine (`utils/data_generator.py`)</h1>
+<p>
+To prevent collision during parallel or repeated test executions, static user data should be minimized. The dynamic generator creates realistic, valid test inputs:
+</p>
+
+<pre><code>import random
+import string
+from datetime import datetime, timedelta
+
+def calculate_t_plus_days(days: int = 6, skip_weekends: bool = False) -> str:
+    """Calculates T+N date formatted as DD/MM/YYYY for SIP and settlement dates (T+6 for ABSLMF Multi-SIP)."""
+    current_date = datetime.now()
+    if not skip_weekends:
+        target_date = current_date + timedelta(days=days)
+    else:
+        added = 0
+        target_date = current_date
+        while added < days:
+            target_date += timedelta(days=1)
+            if target_date.weekday() < 5:  # Monday to Friday
+                added += 1
+    return target_date.strftime("%d/%m/%Y")
+
+def generate_random_mobile() -> str:
+    """Generates a random 10-digit Indian mobile number."""
+    prefix = random.choice(["9", "8", "7", "6"])
+    suffix = "".join(random.choices(string.digits, k=9))
+    return f"{prefix}{suffix}"
+
+def generate_random_email() -> str:
+    """Generates a safe synthetic test email address."""
+    rnd = "".join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    return f"uat_investor_{rnd}@example.com"
+</code></pre>
+
+<div class="page-break"></div>
+
+<!-- CHAPTER 8 -->
+<h1>8. Data-Driven Excel Testing Engine</h1>
+<p>
+The framework includes a fully integrated Excel test execution engine that audits every test row, runs the corresponding automation journey, captures evidence screenshots, and records the results into a timestamped output workbook without mutating the original template.
+</p>
+
+<h3>Core Workflow:</h3>
+<ol>
+  <li><strong>Scaffold Matrix:</strong> Run <code>python &lt;module&gt;_test/utils/generate_test_cases.py</code> to create the structured workbook covering Positive, Negative, and Boundary cases.</li>
+  <li><strong>Data-Driven Runner:</strong> <code>tests/run_excel_tests.py</code> reads each row via <code>ExcelManager</code>.</li>
+  <li><strong>Audit Logging:</strong> On completion, updates the row with <code>PASS</code> or <code>FAIL</code>, the actual outcome string, failure stack trace, and full-page screenshot path.</li>
+  <li><strong>Non-Destructive Output:</strong> Saves to <code>&lt;filename&gt;_results_YYYYMMDD_HHMMSS.xlsx</code> to preserve historical audit logs.</li>
+</ol>
+
+<pre><code># Sample Output Structure in Excel
+| Test_ID     | Module   | Scenario_Type | Description                   | Status | Actual_Result              | Screenshot_Path       |
+|-------------|----------|---------------|-------------------------------|--------|----------------------------|-----------------------|
+| TC_LOG_001  | Login    | Positive      | Valid PAN & OTP login         | PASS   | Authenticated successfully | screenshots/Login...  |
+| TC_SIP_001  | MultiSIP | Positive      | 5-fund DIY selection + T+6    | PASS   | Configured T+6 & 5 funds   | screenshots/Diy...    |
+</code></pre>
+
+<!-- CHAPTER 9 -->
+<h1>9. Step-by-Step Blueprint to Clone for Any New Module</h1>
+<p>
+To stand up a new journey (e.g. <strong>Lumpsum</strong>, <strong>STP</strong>, <strong>Switch</strong>, or <strong>Redemption</strong>), follow these 7 systematic steps:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 15%;">Step</th>
+      <th style="width: 25%;">Action</th>
+      <th style="width: 60%;">Detailed Implementation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Step 1</strong></td>
+      <td>Clone Repository Structure</td>
+      <td>Copy the folder structure. Rename package to <code>&lt;module&gt;_test/</code> (e.g., <code>lumpsum_test/</code>). Keep root <code>conftest.py</code> and <code>requirements.txt</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Step 2</strong></td>
+      <td>Define Central Routes</td>
+      <td>In <code>data/urls.py</code>, add the new module's relative endpoints (e.g. <code>LUMPSUM_PATH = f"{PORTAL_PREFIX}/invest/lumpsum"</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Step 3</strong></td>
+      <td>Define Module Constants</td>
+      <td>In <code>data/test_data.py</code>, add module-specific amounts, scheme codes, and default test inputs. Keep sensitive credentials linked to <code>os.getenv()</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Step 4</strong></td>
+      <td>Create Page Objects</td>
+      <td>Inherit from <code>BasePage</code>. Implement screens: <code>LumpsumLandingPage</code>, <code>LumpsumConfigPage</code>, and reuse <code>LoginPage</code> and <code>PaymentPage</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Step 5</strong></td>
+      <td>Build Linear Pytest Journey</td>
+      <td>Create <code>tests/test_&lt;module&gt;_flow.py</code>. Connect POM methods into a clean, human-readable user journey with step assertions.</td>
+    </tr>
+    <tr>
+      <td><strong>Step 6</strong></td>
+      <td>Generate Test Matrix</td>
+      <td>In <code>utils/generate_test_cases.py</code>, define Positive, Negative, and Boundary scenarios for the new module. Run to generate Excel workbook.</td>
+    </tr>
+    <tr>
+      <td><strong>Step 7</strong></td>
+      <td>Map Excel Runner</td>
+      <td>In <code>tests/run_excel_tests.py</code>, map the new <code>Test_ID</code> cases to the corresponding POM actions.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- CHAPTER 10 -->
+<h1>10. CLI Execution Cheat Sheet</h1>
+<p>
+Save these standardized commands in <code>command.txt</code> for every project:
+</p>
+
+<pre><code># 1. Environment Setup
+python -m venv venv
+.\venv\Scripts\Activate.ps1   # Windows PowerShell
+pip install -r requirements.txt
+playwright install chromium
+
+# 2. Interactive Headed E2E Execution (with Visual Slow-Motion)
+python -m pytest &lt;module&gt;_test/tests/test_&lt;feature&gt;_flow.py --headed --slowmo 500
+
+# 3. Headless CI/CD Execution
+$env:HEADLESS="true"; python -m pytest &lt;module&gt;_test/tests/test_&lt;feature&gt;_flow.py
+
+# 4. Target Specific Environment Tier (LOCAL, QA, UAT, PROD)
+$env:TEST_ENV="QA"; python -m pytest &lt;module&gt;_test/tests/test_&lt;feature&gt;_flow.py --headed
+
+# 5. Generate Excel Test Matrix
+python &lt;module&gt;_test/utils/generate_test_cases.py
+
+# 6. Run Background Data-Driven Excel Suite
+python &lt;module&gt;_test/tests/run_excel_tests.py
+</code></pre>
+
+<div class="callout">
+  <div class="callout-title">Summary & Deliverables</div>
+  By adhering to this master specification, every web automation suite maintains architectural consistency, full visual traceability, rock-solid stability against SPA timing and overlay issues, and instant environment portability.
+</div>
+
+</body>
+</html>
+

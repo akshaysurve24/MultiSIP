@@ -1,0 +1,408 @@
+# End-to-End Test Automation Framework: Complete Implementation Blueprint
+
+> [!NOTE]
+> This document serves as the **master architecture, folder hierarchy, and step-by-step implementation blueprint** for building enterprise-grade, reusable Playwright + Python automation frameworks for any web application (with specialized optimizations for Angular, React, and Vue applications).
+
+---
+
+## 📂 1. Exact Folder Hierarchy
+
+When setting up a new automation project, recreate this exact folder and file structure:
+
+```text
+<Project_Root>/
+│
+├── .agents/
+│   └── AGENTS.md                    # Framework automation rules, lessons learned & locator strategies
+│
+├── <app_name>_test/                 # Main test suite package (e.g., abc_test/)
+│   │
+│   ├── conftest.py                  # Pytest fixtures, viewport configuration & browser launch options
+│   ├── requirements.txt             # Python dependencies (playwright, pytest, openpyxl, faker)
+│   ├── generate_test_cases.py       # Scaffolding engine to generate structured Excel test cases
+│   │
+│   ├── data/
+│   │   ├── urls.py                  # Centralized base domains, route paths, full URLs & dynamic route builders
+│   │   ├── test_data.py             # Default test constants, form inputs, static values, credentials
+│   │   └── dummy_bank_proof.jpg     # Mock files / assets for upload test steps
+│   │
+│   ├── pages/                       # Page Object Model (POM) Layer
+│   │   ├── base_page.py             # Core Playwright wrapper (js_click, slow_fill, full-page screenshots)
+│   │   ├── browse_fund_page.py      # Feature/Page Object 1
+│   │   ├── validate_pan_page.py     # Feature/Page Object 2
+│   │   ├── folio_details_page.py    # Feature/Page Object 3
+│   │   ├── identify_yourself_page.py# Feature/Page Object 4
+│   │   └── investor_details_page.py # Feature/Page Object 5
+│   │
+│   ├── utils/                       # Shared Utilities
+│   │   ├── data_generator.py        # Dynamic test data generators (Faker, random mobile, PAN, email)
+│   │   ├── excel_manager.py         # OpenPyXL manager for reading/writing execution statuses & formatting
+│   │   └── excel_utils.py           # Additional excel helpers, formula handlers, cell stylers
+│   │
+│   ├── screenshots/                 # Auto-generated runtime screenshots organized by Page Object name
+│   │   ├── BrowseFundPage/
+│   │   ├── IdentifyYourselfPage/
+│   │   └── InvestorDetailsPage/
+│   │
+│   └── tests/                       # Test Runners Layer
+│       ├── test_invest_flow.py      # Pytest E2E live visual test suite (headed / slowmo execution)
+│       └── run_excel_tests.py       # Data-driven background execution engine running test cases from Excel
+│
+├── command.txt                      # CLI quick-reference cheat sheet for running tests
+├── uat script.txt                   # Manual test requirements / original test specification notes
+└── implementation_plans/            # Architectural blueprints & implementation guides
+    ├── centralized_url_management_blueprint.md
+    ├── folderwise_screenshot_store.md
+    ├── full_page_screenshot_logic.md
+    ├── playwright_viewport_fix.md
+    └── end_to_end_project_implementation_plan_blueprint.md
+```
+
+---
+
+## 🏗️ 2. Core Architectural Components & Responsibilities
+
+| Component | Directory / File | Core Responsibility |
+| :--- | :--- | :--- |
+| **URL Centralization** | `data/urls.py` | Single source of truth for base domains (DEV, UAT, PROD), portal route prefixes, and dynamic href links. |
+| **Static Test Data** | `data/test_data.py` | Separates user input data (names, IDs, dropdown labels, test constants) from test logic. |
+| **Dynamic Data Engine**| `utils/data_generator.py` | Generates random, unique values (mobile numbers, emails, timestamps) per test run to prevent collision. |
+| **Base Page Wrapper** | `pages/base_page.py` | Encapsulates Playwright interactions, full-page screenshots, JS click bypasses for overlays, and smart waits. |
+| **Page Objects (POM)** | `pages/*_page.py` | Encapsulates page elements, locators, and user action workflows per screen. |
+| **Excel Generator** | `generate_test_cases.py` | Programmatically scaffolds test matrix workbooks (Positive, Negative, Boundary cases) with styling. |
+| **Data-Driven Engine** | `tests/run_excel_tests.py` | Executes tests directly against Excel rows, asserting outcomes and writing back PASS/FAIL results. |
+| **Pytest E2E Runner** | `tests/test_*_flow.py` | Full linear user journey tests runnable with `--headed`, `--slowmo`, or in CI/CD. |
+
+---
+
+## ⚡ 3. End-to-End Step-by-Step Implementation Guide
+
+Follow these 8 steps to bootstrap an identical project from scratch:
+
+### Step 1: Environment Initialization & Dependencies
+1. Create project folder and virtual environment:
+   ```bash
+   mkdir my_new_project
+   cd my_new_project
+   python -m venv venv
+   # Windows:
+   .\venv\Scripts\activate
+   # Linux/Mac:
+   source venv/bin/activate
+   ```
+2. Create `<app_name>_test/requirements.txt`:
+   ```text
+   playwright>=1.40.0
+   pytest>=7.4.0
+   pytest-playwright>=0.4.0
+   openpyxl>=3.1.0
+   faker>=20.0.0
+   requests>=2.31.0
+   ```
+3. Install dependencies and download browser binaries:
+   ```bash
+   pip install -r abc_test/requirements.txt
+   playwright install chromium
+   ```
+
+---
+
+### Step 2: Browser & Pytest Configuration (`conftest.py`)
+Create `<app_name>_test/conftest.py` to support maximized window rendering and prevent viewport clipping:
+
+```python
+import pytest
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "no_viewport": True
+    }
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    return {
+        **browser_type_launch_args,
+        "headless": False,             # Headed by default for interactive review
+        "args": ["--start-maximized"]   # Launch fully maximized
+    }
+```
+
+---
+
+### Step 3: Centralized URL Configuration (`data/urls.py`)
+Create `<app_name>_test/data/urls.py` so that switching domains or portal route prefixes requires editing only **one file**:
+
+```python
+import os
+
+class AppURLs:
+    # 1. Environment Domains
+    ENV_DOMAINS = {
+        "LOCAL": "http://localhost:3000",
+        "QA": "https://qa.example.com",
+        "UAT": "https://mutualfundbeta.abslmfbeta.com",
+        "PROD": "https://mutualfund.adityabirlacapital.com",
+    }
+    ACTIVE_ENV = os.getenv("TEST_ENV", "UAT").upper()
+    BASE_URL = ENV_DOMAINS.get(ACTIVE_ENV, ENV_DOMAINS["UAT"])
+
+    # 2. Route Prefixes
+    PORTAL_PREFIX = "/portal/investor"
+
+    # 3. Route Paths (Relative)
+    BROWSE_FUND_PATH = f"{PORTAL_PREFIX}/quick-invest/browsefund"
+    FUND_SELECT_FLEXI_PATH = f"{PORTAL_PREFIX}/quick-invest/fund-select;fundcode=FOFSI"
+    VALIDATE_PAN_PATH = f"{PORTAL_PREFIX}/quick-invest/validatePAN"
+    FOLIO_DETAILS_PATH = f"{PORTAL_PREFIX}/quick-invest/folio-details"
+    IDENTIFY_YOURSELF_PATH = f"{PORTAL_PREFIX}/identify-yourself"
+    INVESTOR_DETAILS_PATH = f"{PORTAL_PREFIX}/quick-invest/investor-details"
+    LUMPSUM_SIP_PATH = f"{PORTAL_PREFIX}/quick-invest/lumpsum-sip"
+    CART_PATH = f"{PORTAL_PREFIX}/quick-invest/cart"
+
+    # 4. Absolute URLs
+    BROWSE_FUND_URL = f"{BASE_URL}{BROWSE_FUND_PATH}"
+    VALIDATE_PAN_URL = f"{BASE_URL}{VALIDATE_PAN_PATH}"
+    FOLIO_DETAILS_URL = f"{BASE_URL}{FOLIO_DETAILS_PATH}"
+    IDENTIFY_YOURSELF_URL = f"{BASE_URL}{IDENTIFY_YOURSELF_PATH}"
+    INVESTOR_DETAILS_URL = f"{BASE_URL}{INVESTOR_DETAILS_PATH}"
+    LUMPSUM_SIP_URL = f"{BASE_URL}{LUMPSUM_SIP_PATH}"
+    CART_URL = f"{BASE_URL}{CART_PATH}"
+
+    @classmethod
+    def get_fund_select_path(cls, fund_code: str = "FOFSI") -> str:
+        return f"{cls.PORTAL_PREFIX}/quick-invest/fund-select;fundcode={fund_code}"
+```
+
+---
+
+### Step 4: Test Data Management (`data/test_data.py`)
+Create `<app_name>_test/data/test_data.py`:
+
+```python
+from data.urls import AppURLs
+
+class TestData:
+    URL = AppURLs.BROWSE_FUND_URL
+    PAN = "AKNPM6102E"
+    NAME = "RAJKUMAR MARUDHAVANAN"
+    
+    # DOB: dd mm yyyy
+    DOB_DAY = "11"
+    DOB_MONTH = "Mar"
+    DOB_YEAR = "1978"
+
+    # Tax Status and Mode of Holding
+    TAX_STATUS_CODE = "01"       # Resident Individual
+    MODE_OF_HOLDING_CODE = "SI"  # Single
+    OTP_CODE = "1234"
+
+    # Investor Details
+    OCCUPATION_LABEL = "Service"
+    PEP_LABEL = "Not Applicable"
+    GAI_LABEL = " Below 1 Lakh"
+    ADDRESS_TYPE_LABEL = " Residential/Business "
+    CITY = "Mumbai"
+    COUNTRY_LABEL = "INDIA"
+    GENDER_LABEL = "Male"
+    IFSC_CODE = "UTIB0000004"
+    ACCOUNT_NO = "920011234567890"
+    ACCOUNT_TYPE_LABEL = "Savings Account"
+    BANK_PROOF_IMAGE = "dummy_bank_proof.jpg"
+```
+
+---
+
+### Step 5: Base Page Object with Auto Page-Wise Screenshots (`pages/base_page.py`)
+Create `<app_name>_test/pages/base_page.py`:
+
+```python
+import time
+import os
+from playwright.sync_api import Page, Locator
+
+class BasePage:
+    def __init__(self, page: Page):
+        self.page = page
+
+    def go_to(self, url: str):
+        self.page.goto(url)
+        self.take_screenshot("navigation")
+
+    def click(self, locator: str, name_for_screenshot: str = "click", force: bool = False):
+        self.page.locator(locator).click(force=force)
+        self.take_screenshot(name_for_screenshot)
+
+    def js_click(self, locator: str, name_for_screenshot: str = "js_click"):
+        """Performs a native DOM click using JS evaluation to bypass overlays/sticky headers."""
+        self.page.locator(locator).evaluate("node => node.click()")
+        self.take_screenshot(name_for_screenshot)
+
+    def slow_fill(self, locator: str, text: str, delay_ms: float = 100, name_for_screenshot: str = "fill"):
+        """Fills an input field character by character slowly."""
+        loc: Locator = self.page.locator(locator)
+        loc.clear()
+        for char in text:
+            loc.type(char, delay=delay_ms)
+        self.take_screenshot(name_for_screenshot)
+
+    def select_option_by_label(self, locator: str, label: str, name_for_screenshot: str = "select"):
+        """Selects an option from a dropdown by its visible label string."""
+        self.page.locator(locator).select_option(label=label)
+        self.take_screenshot(name_for_screenshot)
+
+    def select_option_by_value(self, locator: str, value: str, name_for_screenshot: str = "select"):
+        """Selects an option from a dropdown by its value attribute."""
+        self.page.locator(locator).select_option(value=value)
+        self.take_screenshot(name_for_screenshot)
+
+    def wait_for_selector(self, locator: str, state: str = "visible"):
+        self.page.wait_for_selector(locator, state=state)
+
+    def wait(self, ms: int):
+        self.page.wait_for_timeout(ms)
+
+    def take_screenshot(self, name: str):
+        """Captures full-page unblurred screenshots into class-specific folders."""
+        page_name = self.__class__.__name__
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        screenshot_dir = os.path.join(base_dir, "screenshots", page_name)
+        os.makedirs(screenshot_dir, exist_ok=True)
+        timestamp = int(time.time() * 1000)
+        screenshot_path = os.path.join(screenshot_dir, f"{name}_{timestamp}.png")
+        self.page.screenshot(path=screenshot_path, full_page=True, animations="disabled")
+        print(f"Screenshot saved to: {screenshot_path}")
+```
+
+---
+
+### Step 6: Dynamic Data Generator (`utils/data_generator.py`)
+Create `<app_name>_test/utils/data_generator.py`:
+
+```python
+import random
+import string
+
+def generate_random_mobile() -> str:
+    """Generates a random 10-digit Indian mobile number."""
+    prefix = random.choice(['9', '8', '7', '6'])
+    suffix = ''.join(random.choices(string.digits, k=9))
+    return f"{prefix}{suffix}"
+
+def generate_random_email() -> str:
+    """Generates a random valid email address."""
+    random_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    return f"uat_test_{random_str}@example.com"
+```
+
+---
+
+### Step 7: Page Objects Implementation (`pages/*.py`)
+Follow the POM pattern. Example for `pages/browse_fund_page.py`:
+
+```python
+from pages.base_page import BasePage
+from data.urls import AppURLs
+
+class BrowseFundPage(BasePage):
+    def __init__(self, page):
+        super().__init__(page)
+        # Use dynamic URLs and visible=true
+        self.invest_now_flexi_fund = f"a[href='{AppURLs.FUND_SELECT_FLEXI_PATH}'] >> visible=true >> nth=0"
+
+    def navigate_to_browse_funds(self, url: str):
+        self.go_to(url)
+
+    def click_invest_now(self):
+        self.wait_for_selector(self.invest_now_flexi_fund)
+        self.js_click(self.invest_now_flexi_fund, "click_invest_now")
+        self.page.wait_for_load_state("networkidle")
+        self.wait(1000)
+```
+
+---
+
+### Step 8: Master E2E Pytest Runner (`tests/test_invest_flow.py`)
+Create `<app_name>_test/tests/test_invest_flow.py`:
+
+```python
+import pytest
+from playwright.sync_api import Page
+from data.test_data import TestData
+from utils.data_generator import generate_random_mobile, generate_random_email
+from pages.browse_fund_page import BrowseFundPage
+from pages.validate_pan_page import ValidatePanPage
+from pages.folio_details_page import FolioDetailsPage
+from pages.identify_yourself_page import IdentifyYourselfPage
+from pages.investor_details_page import InvestorDetailsPage
+
+def test_flexi_fund_investment_flow(page: Page):
+    # 1. Initialize Pages
+    browse_fund = BrowseFundPage(page)
+    validate_pan = ValidatePanPage(page)
+    folio_details = FolioDetailsPage(page)
+    identify_yourself = IdentifyYourselfPage(page)
+    investor_details = InvestorDetailsPage(page)
+
+    # 2. Dynamic inputs
+    mobile = generate_random_mobile()
+    email = generate_random_email()
+
+    # 3. Execute Step-by-Step Flow
+    browse_fund.navigate_to_browse_funds(TestData.URL)
+    browse_fund.click_invest_now()
+
+    validate_pan.enter_pan(TestData.PAN)
+    folio_details.click_create_new_folio()
+
+    identify_yourself.enter_name(TestData.NAME)
+    identify_yourself.select_dob(TestData.DOB_DAY, TestData.DOB_MONTH, TestData.DOB_YEAR)
+    identify_yourself.select_tax_status(TestData.TAX_STATUS_CODE)
+    identify_yourself.select_mode_of_holding(TestData.MODE_OF_HOLDING_CODE)
+    identify_yourself.enter_mobile(mobile)
+    identify_yourself.enter_email(email)
+    identify_yourself.click_generate_otp()
+    identify_yourself.enter_otp(TestData.OTP_CODE)
+    identify_yourself.click_proceed()
+
+    # Continue subsequent steps...
+```
+
+---
+
+## 🎯 4. Golden Rules for Angular & Modern SPA Automation
+
+Save these in `.agents/AGENTS.md` to ensure any developer or AI agent adheres to them:
+
+1. **Avoid Strict Mode Violations**:
+   - Modern SPAs frequently render desktop + mobile navigation elements in parallel.
+   - Always append `>> visible=true` (e.g., `select.selectDatePicker >> visible=true`) or use `>> nth=0`.
+2. **Bypass Angular Loading Overlays**:
+   - Spinners (`ngx-ui-loader`) and sticky headers (`app-new-header`) often intercept native clicks.
+   - Use `BasePage.js_click(selector)`: `page.locator(selector).evaluate("node => node.click()")`.
+3. **Case-Insensitive Form Control Attributes**:
+   - Angular forms use `formControlName="taxStatus"` or `TaxStatus`.
+   - Always write `select[formcontrolname='TaxStatus' i]` to prevent case-mismatch timeout errors.
+4. **Dropdown Selection by Visible Text**:
+   - Angular often dynamically assigns internal option values (e.g., `"39: 2"` for March).
+   - Never rely on `select_option(value="...")`; always use `select_option(label="March")`.
+5. **Full-Page Screenshot Precision**:
+   - Always pass `full_page=True, animations="disabled"` to `page.screenshot()`.
+   - Store screenshots automatically in folder hierarchies named after the calling Page Object class.
+
+---
+
+## 🚀 5. Command Reference Cheat Sheet (`command.txt`)
+
+```powershell
+# 1. Run Live Headed Pytest Flow with Visual Slow-Mo:
+cd <app_name>_test
+python -m pytest tests/test_invest_flow.py --headed --slowmo 500
+
+# 2. Run Background Excel Test Scaffolding:
+python generate_test_cases.py
+
+# 3. Run Data-Driven Tests via Excel Engine:
+python tests/run_excel_tests.py
+```

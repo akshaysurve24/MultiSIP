@@ -1,0 +1,43 @@
+# Multi-SIP Automation Command Reference Cheat Sheet
+# ===================================================
+
+# 1. Setup & Installation
+# -----------------------
+python -m venv venv
+# Windows PowerShell:
+.\venv\Scripts\Activate.ps1
+# Windows CMD:
+.\venv\Scripts\activate.bat
+# Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+playwright install chromium
+
+# 2. Run Live Headed Pytest Flow with Visual Slow-Mo (Multi-SIP DIY Journey):
+# ----------------------------------------------------------------------------
+python -m pytest tests/test_multisip_flow.py --headed --slowmo 500
+
+# 3. Run Headless Execution (for CI/CD or Background Runner):
+# -----------------------------------------------------------
+# Windows PowerShell:
+$env:HEADLESS="true"; python -m pytest tests/test_multisip_flow.py
+# Windows CMD:
+set HEADLESS=true && python -m pytest tests/test_multisip_flow.py
+
+# 4. Target Specific Environment (LOCAL, QA, UAT, PROD):
+# -------------------------------------------------------
+$env:TEST_ENV="QA"; python -m pytest tests/test_multisip_flow.py --headed
+
+# 5. Generate Excel Test Cases Matrix:
+# ------------------------------------
+python utils/generate_test_cases.py
+
+# 6. Run Data-Driven Test Cases via Excel Engine:
+# -----------------------------------------------
+python tests/run_excel_tests.py
+
+# 7. Run Preserved Legacy Single-Invest Flow (Appendix A):
+# --------------------------------------------------------
+python -m pytest tests/test_invest_flow.py --headed --slowmo 500
+
