@@ -3,7 +3,7 @@ import string
 from datetime import datetime, timedelta
 
 
-def calculate_t_plus_days(days: int = 6, skip_weekends: bool = False) -> str:
+def calculate_t_plus_days(days: int = 6, skip_weekends: bool = True) -> str:
     """
     Calculates T + N date formatted as DD/MM/YYYY.
     If skip_weekends is True, adds business days only.

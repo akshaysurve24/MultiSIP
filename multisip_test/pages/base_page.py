@@ -47,7 +47,7 @@ class BasePage:
             loc.type(char, delay=delay_ms)
         self.take_screenshot(name_for_screenshot)
 
-    def fill(self, locator: str, text: str, name_for_screenshot: str = "fill"):
+    def fast_fill(self, locator: str, text: str, name_for_screenshot: str = "fill"):
         """Direct fill method for fast value entry followed by screenshot."""
         self.page.locator(locator).first.fill(str(text))
         self.take_screenshot(name_for_screenshot)

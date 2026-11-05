@@ -167,7 +167,7 @@ class MultiSipDiyPage(BasePage):
                     target.evaluate("node => node.click()")
                     self.wait(500)
 
-    def click_start_sip(self):
+    def click_start_multisip(self):
         """Waits for the Start Multi-SIP button to be enabled and clicks it with JS fallback."""
         print("Locating Start Multi-SIP button...")
         btn = self.page.locator("button:has-text('Start Multi-SIP')").last

@@ -1,6 +1,7 @@
 import time
 from pages.base_page import BasePage
 from data.urls import AppURLs
+from data.test_data import TestData# imported to use central data  and to avoid direct value exposure in code.
 
 
 class LoginPage(BasePage):
@@ -25,9 +26,13 @@ class LoginPage(BasePage):
         self.go_to(target_url)
         self.wait_for_selector(self.pan_input, state="visible")
 
-    def enter_pan(self, pan: str):
-        """Types the PAN number into the input field."""
-        self.slow_fill(self.pan_input, pan.upper(), delay_ms=80, name_for_screenshot="enter_pan")
+    #def enter_pan(self, pan: str = "eyzps3598j"):
+        """Types the PAN number into the input field char by char (slow typed) by using slow_fill."""
+       # self.slow_fill(self.pan_input, pan.upper(), delay_ms=10, name_for_screenshot="enter_pan")
+
+    def enter_pan(self , pan: str ="eyzps3598j"):
+        """Types the PAN number into the input field quick like copy-paste by using self.fill"""
+        self.fast_fill(self.pan_input, pan.upper(), name_for_screenshot="enter_pan")
 
     def accept_terms(self):
         """Ensures the Terms and Conditions checkbox is checked."""
@@ -48,7 +53,7 @@ class LoginPage(BasePage):
         )
         self.click(self.continue_button, "click_continue_with_pan")
 
-    def enter_otp(self, otp: str = "1234"):
+    def enter_otp(self, otp: str="1234"): #
         """Fills the 4-digit OTP into separate input boxes."""
         digits = [char for char in str(otp).strip()]
         if len(digits) < 4:
@@ -71,10 +76,15 @@ class LoginPage(BasePage):
         # Allow transition / redirect after OTP entry
         self.wait(2000)
 
-    def login_with_pan(self, pan: str, otp: str = "1234"):
-        """Complete helper to perform the full login flow."""
-        self.enter_pan(pan)
+
+
+    ### optional full flow by adding above all function in one place by calling below function in test_multisip_flow.py to reduce code. ####
+    def login_with_pan_journey(self, pan: str = TestData.PAN, otp: str = "1234"):#MANDATORY to mentioned pan and otp value or imporing test data page as secret
+        """Complete helper to perform the full login flow. """
+        
+        self.navigate_to_login()
+        self.enter_pan(pan)#mandatory to call pan paramenter from enter_pan() function for this sepreate function login_with_pan_journey().
         self.accept_terms()
         self.click_continue()
-        self.enter_otp(otp)
+        self.enter_otp(otp)#mandatory to call otp paramenter from enter_otp() function for this sepreate function login_with_pan_journey().
 

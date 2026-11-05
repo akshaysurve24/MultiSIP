@@ -42,5 +42,7 @@ playwright-report/
 blob-report/
 
 # Screenshots
-screenshots/*/*.png
+screenshots/
+**/screenshots/
+*.png
 

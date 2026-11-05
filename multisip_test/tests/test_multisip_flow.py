@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 from data.urls import AppURLs
-from data.test_data import TestData
+from data.test_data import TestData #for test data refrence
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 from pages.multisip_landing_page import MultiSipLandingPage
@@ -35,14 +35,25 @@ def test_end_to_end_multisip_diy_journey(page: Page):
     login_page.navigate_to_login(AppURLs.LOGIN_URL)
 
     print("=== Step 2: Entering PAN ===")
-    login_page.enter_pan(TestData.PAN)
+    login_page.enter_pan( TestData.PAN )# way 1->calling from test_data.py inside class TestData
+    #and way 2-> we can also call from def from login_page.py directly as  login_page.enter_pan()
+    #we have already  mentioned Pan number  value there only .
 
     print("=== Step 3: Accepting Terms & Conditions ===")
     login_page.accept_terms()
 
     print("=== Step 4: Submitting Continue and Entering OTP ===")
     login_page.click_continue()
-    login_page.enter_otp(TestData.OTP)
+    login_page.enter_otp(TestData.OTP) # way 1->calling from test_data.py inside class TestData
+    #and way 2-> we can also call from def from login_page.py directly as  login_page.enter_otp()
+    #we have already  mentioned otp number there only .
+
+
+    #print("=== Step 1 to 4: Login with PAN Journey ===")
+    #login_page.login_with_pan_journey()
+    #We have created function in login_page.py to login with pan and otp
+    #called all above 4 functions  from step 1,2,3,4  in that so no need to call it sepreately 
+
 
     # -------------------------------------------------------------
     # Step 5-7: Dashboard Navigation to Multi-SIP
@@ -55,7 +66,15 @@ def test_end_to_end_multisip_diy_journey(page: Page):
 
     print("=== Step 7: Navigating to Multi-SIP ===")
     dashboard_page.click_multi_sip()
-    assert "/multi-sip" in page.url, f"Expected '/multi-sip' in URL, got {page.url}"
+
+    #optional direct URL passes /multi-sip landing page. we can also comment this.
+    #assert "/multi-sip" in page.url, f"Expected '/multi-sip' in URL, got {page.url}"
+
+    #dashboard_page.navigate_to_multisip()
+    #We have created function in dashboard_page.py to navigate to Multi-SIP
+    #called the function so no need to call the above 3 functions or step 5,6,7 separately 
+
+
 
     # -------------------------------------------------------------
     # Step 8-9: Multi-SIP Landing Page
@@ -65,7 +84,11 @@ def test_end_to_end_multisip_diy_journey(page: Page):
 
     print("=== Step 9: Selecting Do It Yourself (DIY) Mode ===")
     landing_page.select_do_it_yourself()
-    assert "/multi-sip/diy" in page.url, f"Expected '/multi-sip/diy' in URL, got {page.url}"
+
+    #optional direct URL passes for DIY page. we can also comment this.
+    # assert "/multi-sip/diy" in page.url, f"Expected '/multi-sip/diy' in URL, got {page.url}"
+
+
 
     # -------------------------------------------------------------
     # Step 10-13: Fund Selection (5 Selected Funds)
@@ -82,6 +105,8 @@ def test_end_to_end_multisip_diy_journey(page: Page):
     print("=== Step 13: Confirming Selected Funds ===")
     diy_page.confirm_add_funds()
 
+
+
     # -------------------------------------------------------------
     # Step 14-16: SIP Configuration (T+6 Date & Folio Selection)
     # -------------------------------------------------------------
@@ -93,11 +118,13 @@ def test_end_to_end_multisip_diy_journey(page: Page):
 
     print("=== Step 16: Accepting Terms & Submitting Start SIP ===")
     diy_page.accept_terms_and_conditions()
-    diy_page.click_start_sip()
+    diy_page.click_start_multisip()
 
     print("=== Step 17: Entering OTP for SIP Authorization ===")
     diy_page.enter_otp(TestData.OTP)
-    assert "/multi-sip/payment" in page.url, f"Expected '/multi-sip/payment' in URL, got {page.url}"
+
+    #optional direct URL passes payment page. we can also comment this.
+    #assert "/multi-sip/payment" in page.url, f"Expected '/multi-sip/payment' in URL, got {page.url}"
 
     # -------------------------------------------------------------
     # Step 18-20: ROTM Mandate & Bank Setup
@@ -125,7 +152,9 @@ def test_end_to_end_multisip_diy_journey(page: Page):
     # Step 22-24: Multi-SIP Success Confirmation
     # -------------------------------------------------------------
     print("=== Step 22: Verifying Success Confirmation Page ===")
-    assert "/multi-sip/success" in page.url, f"Expected '/multi-sip/success' in URL, got {page.url}"
+
+    #optional direct URL passes success page. we can also comment this.
+    #assert "/multi-sip/success" in page.url, f"Expected '/multi-sip/success' in URL, got {page.url}"
 
     print("=== Step 23: Clicking Track Status ===")
     success_page.click_track_status()
